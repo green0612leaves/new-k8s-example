@@ -37,7 +37,7 @@ spec:
             cpu: "256m"
         readinessProbe: 
           httpGet:
-            path: /healthy
+            path: /api/healthy
             port: 5000
             scheme: HTTP
           initialDelaySeconds: 10
@@ -47,7 +47,7 @@ spec:
           timeoutSeconds: 1
         livenessProbe: 
           httpGet:
-            path: /healthy
+            path: /api/healthy
             port: 5000
             scheme: HTTP
           failureThreshold: 5
@@ -56,7 +56,7 @@ spec:
           timeoutSeconds: 1
         startupProbe: 
           httpGet:
-            path: /healthy
+            path: /api/healthy
             port: 5000
             scheme: HTTP
           initialDelaySeconds: 10
