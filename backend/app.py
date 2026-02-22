@@ -31,7 +31,7 @@ class Text(db.Model):
 
 @app.route('/api/healthy')
 def healthy():
-    return {"healthy-api": True}, 200
+    return {"healthy-api-1": True}, 200
 
 
 @app.route('/api/host_name')
