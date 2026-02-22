@@ -13,5 +13,3 @@ database:
   uri: pg-service
   username: postgres
   password: postgres
-hello-flask:
-  tag: 3f502f0
