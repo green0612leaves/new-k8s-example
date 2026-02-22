@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: example
+  name: example-1
   annotations:
     argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^main
     argocd-image-updater.argoproj.io/backend.helm.image-name: backend.image
