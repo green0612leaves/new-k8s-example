@@ -21,7 +21,7 @@ spec:
   project: default
   source:
     path: .
-    repoURL: https://github.com/zhangrui20200722/new-k8s-example-helm.git.git
+    repoURL: https://github.com/zhangrui20200722/new-k8s-example-helm.git
     targetRevision: main
   syncPolicy:
     automated: {}
