@@ -14,4 +14,4 @@ database:
   username: postgres
   password: postgres
 hello-flask:
-  tag: 4afa87d
+  tag: 3f502f0
