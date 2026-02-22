@@ -5,6 +5,10 @@ on:
     branches:
       - "main"
 
+# 添加权限配置，允许修改和推送代码
+permissions:
+  contents: write  # 赋予写入仓库内容的权限
+
 env:
   DOCKERHUB_USERNAME: zhangrui20200722
 
@@ -13,33 +17,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set outputs
+        uses: actions/checkout@v4  # 升级到最新版，兼容性更好
+        with:
+          fetch-depth: 0  # 拉取完整提交历史，避免提交时出错
+
+      - name: Set outputs (新语法)
         id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: |
+          # 使用新的 GITHUB_OUTPUT 语法设置变量，替代废弃的 set-output
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3  # 升级到最新稳定版
+
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3  # 升级到最新稳定版
+
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3  # 升级到最新稳定版
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build backend and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5  # 升级到最新稳定版
         with:
           context: backend
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ env.DOCKERHUB_USERNAME }}/backend:${{ steps.vars.outputs.sha_short }}
+
       - name: Build frontend and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5  # 升级到最新稳定版
         with:
           context: frontend
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ env.DOCKERHUB_USERNAME }}/frontend:${{ steps.vars.outputs.sha_short }}
+
       - name: Update helm values.yaml
         uses: fjogeleit/yaml-update-action@main
         with:
