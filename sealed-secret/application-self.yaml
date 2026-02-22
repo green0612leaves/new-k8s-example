@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: example
+  annotations:
+    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^main
+    argocd-image-updater.argoproj.io/backend.helm.image-name: backend.image
+    argocd-image-updater.argoproj.io/backend.helm.image-tag: backend.tag
+    argocd-image-updater.argoproj.io/backend.pull-secret: pullsecret:argocd/dockerhub-secret
+    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^main
+    argocd-image-updater.argoproj.io/frontend.helm.image-name: frontend.image
+    argocd-image-updater.argoproj.io/frontend.helm.image-tag: frontend.tag
+    argocd-image-updater.argoproj.io/frontend.pull-secret: pullsecret:argocd/dockerhub-secret
+    argocd-image-updater.argoproj.io/image-list: frontend=zhangrui20200722/frontend, backend=zhangrui20200722/backend
+    argocd-image-updater.argoproj.io/update-strategy: latest
+    argocd-image-updater.argoproj.io/write-back-method: git
+spec:
+  destination:
+    namespace: gitops-example-updater
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: .
+    repoURL: https://github.com/zhangrui20200722/new-k8s-example-helm.git.git
+    targetRevision: main
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
