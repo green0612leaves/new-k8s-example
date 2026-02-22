@@ -64,5 +64,5 @@ jobs:
           message: 'Update Image Version to ${{ steps.vars.outputs.sha_short }}'
           changes: |
             {
-              "hello-flask[tag]": "${{ steps.vars.outputs.sha_short }}"
+                "\"hello-flask\".tag": "${{ steps.vars.outputs.sha_short }}"
             }
