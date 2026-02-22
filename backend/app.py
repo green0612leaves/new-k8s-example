@@ -29,12 +29,12 @@ class Text(db.Model):
         return f"<Text {self.text}>"
 
 
-@app.route('/healthy')
+@app.route('/api/healthy')
 def healthy():
-    return {"healthy": True}, 200
+    return {"healthy-api": True}, 200
 
 
-@app.route('/host_name')
+@app.route('/api/host_name')
 def host_name():
     return {"host_name": os.environ.get('HOSTNAME')}, 200
 
@@ -45,7 +45,7 @@ def ab():
     return {"ab": True}, 200
 
 
-@app.route('/fetch')
+@app.route('/api/fetch')
 def fetch():
     words = Text.query.all()
     results = [
@@ -55,7 +55,7 @@ def fetch():
     return {"texts": results}, 200
 
 
-@app.route('/add', methods=['POST'])
+@app.route('/api/add', methods=['POST'])
 def add():
     text = request.json['text']
     db.session.add(Text(text=text))
@@ -63,7 +63,7 @@ def add():
     return 'Done', 201
 
 
-@app.route('/delete', methods=['DELETE'])
+@app.route('/api/delete', methods=['DELETE'])
 def delete():
     db.session.query(Text).delete()
     db.session.commit()
