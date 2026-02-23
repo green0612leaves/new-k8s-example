@@ -1,29 +1,46 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: example-1
+  name: example-2
+  namespace: argocd  # Application本身要放在argocd命名空间（这个是对的）
   annotations:
-    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^main
+    # 1. 监听的镜像列表（DockerHub镜像）
+    argocd-image-updater.argoproj.io/image-list: |
+      frontend=zhangrui20200722/frontend,
+      backend=zhangrui20200722/backend
+    # 2. 前端镜像配置
+    argocd-image-updater.argoproj.io/frontend.allow-tags: ^main.*$  # 正确的正则格式（匹配main开头标签）
+    argocd-image-updater.argoproj.io/frontend.update-strategy: latest  # 每个镜像单独指定策略
+    argocd-image-updater.argoproj.io/frontend.helm.image-name: frontend.image  # values.yaml中镜像仓库字段
+    argocd-image-updater.argoproj.io/frontend.helm.image-tag: frontend.tag    # values.yaml中镜像标签字段
+    argocd-image-updater.argoproj.io/frontend.pull-secret: pullsecret:argocd/dockerhub-secret  # DockerHub认证
+    # 3. 后端镜像配置（和前端一致）
+    argocd-image-updater.argoproj.io/backend.allow-tags: ^main.*$
+    argocd-image-updater.argoproj.io/backend.update-strategy: latest
     argocd-image-updater.argoproj.io/backend.helm.image-name: backend.image
     argocd-image-updater.argoproj.io/backend.helm.image-tag: backend.tag
     argocd-image-updater.argoproj.io/backend.pull-secret: pullsecret:argocd/dockerhub-secret
-    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^main
-    argocd-image-updater.argoproj.io/frontend.helm.image-name: frontend.image
-    argocd-image-updater.argoproj.io/frontend.helm.image-tag: frontend.tag
-    argocd-image-updater.argoproj.io/frontend.pull-secret: pullsecret:argocd/dockerhub-secret
-    argocd-image-updater.argoproj.io/image-list: frontend=zhangrui20200722/frontend, backend=zhangrui20200722/backend
-    argocd-image-updater.argoproj.io/update-strategy: latest
+    # 4. Git写回核心配置（必须加！）
     argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main  # 你的GitHub分支
+    argocd-image-updater.argoproj.io/git-credentials-secret: github-creds  # GitHub认证Secret（你需要创建）
+    # 可选：自定义提交信息
+    argocd-image-updater.argoproj.io/commit-message-template: "chore: update {{.ImageName}} to {{.NewTag}}"
 spec:
   destination:
-    namespace: gitops-example-updater
+    namespace: default  # 业务应用部署到default命名空间（避免和argocd混在一起）
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: .
-    repoURL: https://github.com/zhangrui20200722/new-k8s-example-helm.git
+    path: .  # values.yaml在仓库根目录（正确）
+    repoURL: https://github.com/green0612leaves/new-k8s-example-helm.git
     targetRevision: main
+    helm:
+      valueFiles:  # 关键！指定要修改的values.yaml文件
+        - values.yaml
   syncPolicy:
-    automated: {}
+    automated:
+      prune: true    # 清理不在Git中的资源
+      selfHeal: true # Git变更后自动修复应用状态（核心）
     syncOptions:
       - CreateNamespace=true
