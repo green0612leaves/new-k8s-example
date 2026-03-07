@@ -1,11 +1,11 @@
 frontend:
   image: zhangrui20200722/frontend
-  tag: 2588faf
+  tag: 6381acd
   autoscaling:
     averageUtilization: 90
 backend:
   image: zhangrui20200722/backend
-  tag: 2588faf
+  tag: 6381acd
   autoscaling:
     averageUtilization: 90
 database:
